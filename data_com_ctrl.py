@@ -3,11 +3,8 @@ import csv
 
 class DataMain():
     def __init__(self):
-        self.StartStream = "#A#\n"
-        self.StopStream = "#S#\n"
-
         self.msg = []
-
+        self.msgTemp = []
         self.xData = []
         self.yData = []
         self.x = []
@@ -22,9 +19,15 @@ class DataMain():
                 if self.msg[0] in "D":
                     del self.msg[0]
                     del self.msg[-1]
+                if self.msg[0] in "T":
+                    self.msgTemp = self.msg[1]
+
     
     def IntMsgFunc(self):
         self.IntMsg = [int(msg) for msg in self.msg]
+    
+    def FloatMsgFunc(self):
+        self.FloatMsg = float(self.msgTemp)
 
     def ClearData(self):
         self.RowMsg = ""

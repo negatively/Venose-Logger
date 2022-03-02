@@ -98,10 +98,6 @@ class ComGUI():
 
                 self.conn = ConnGUI(self.root, self.serial, self.data)
 
-                # self.serial.t1 = threading.Thread(
-                #     target = self.serial.SerialSync, args=(self,), daemon=True
-                # )
-                # self.serial.t1.start()
 
             else:
                 ErrorMsg = f"Error"
@@ -109,6 +105,7 @@ class ComGUI():
             
         else:
             self.serial.threading = False
+            self.serial.threading_temp = False
             self.serial.SerialClose(self)
 
             self.conn.ConnGUIClose()
@@ -162,6 +159,11 @@ class ConnGUI():
         self.graph.text = self.graph.canvas.create_text(50, 50, anchor=E, text='---')
         # Static Part #
         self.graph.canvas.create_text(65, 50, anchor=E, text='C')
+
+        self.serial.t4 = threading.Thread(
+            target=self.serial.SerialTemp, args=(self,), daemon = True
+        )
+        self.serial.t4.start()
         
         
 
@@ -175,7 +177,7 @@ class ConnGUI():
         self.ConnGUIOpen()
 
     def GraphCtrl(self):
-        self.graph.canvas.itemconfig(self.graph.text, text=f"{self.data.IntMsg[0]}")
+        self.graph.canvas.itemconfig(self.graph.text, text=f"{self.data.FloatMsg}")
     
     def ConnGUIOpen(self):
         
@@ -240,6 +242,7 @@ class ConnGUI():
             self.btn_start_stream["state"] = "active" 
     
     def start_stream(self):
+        self.serial.threading_temp = False
         # Menambahkan figure plot
         self.serial.ser.write(bytes('H', 'UTF-8'))
 

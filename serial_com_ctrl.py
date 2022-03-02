@@ -85,8 +85,24 @@ class SerialCtrl():
                         gui.data.x = [k for k in gui.data.xData]
                     else:
                         gui.data.y = gui.data.yData[self.lenYdata-printRange:self.lenYdata]
-                        gui.data.x = gui.data.xData[self.lenXdata-printRange:self.lenXdata]                   
-                    
+                        gui.data.x = gui.data.xData[self.lenXdata-printRange:self.lenXdata] 
+
+                except Exception as e:
+                    print(e)
+
+    def SerialTemp(self, gui):
+        self.threading_temp = True
+        cnt = 0
+        while self.threading_temp:
+            data = self.ser.readline()
+            if len(data) > 0:
+                try:
+                    ###############################################
+
+                    gui.data.RowMsg = data
+                    gui.data.DecodeMsg()
+                    gui.data.FloatMsgFunc()
+                    ###############################################                                        
                     
                     t2 = threading.Thread(target=gui.GraphCtrl(), args=(gui.graph,), daemon=True)
                     t2.start()
