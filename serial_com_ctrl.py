@@ -50,17 +50,18 @@ class SerialCtrl():
     
     
     def SerialData(self, gui):
+        self.threading_temp = False
         self.threading = True
-        cnt = 0
+        
         while self.threading:
             data = self.ser.readline()
             if len(data) > 0:
                 try:
                     ###############################################
-
                     gui.data.RowMsg = data
                     gui.data.DecodeMsg()
                     gui.data.IntMsgFunc()
+                    
                     ###############################################                                      
 
                     gui.data.yData.append(gui.data.IntMsg)
@@ -85,14 +86,13 @@ class SerialCtrl():
                         gui.data.x = [k for k in gui.data.xData]
                     else:
                         gui.data.y = gui.data.yData[self.lenYdata-printRange:self.lenYdata]
-                        gui.data.x = gui.data.xData[self.lenXdata-printRange:self.lenXdata] 
+                        gui.data.x = gui.data.xData[self.lenXdata-printRange:self.lenXdata]
 
                 except Exception as e:
                     print(e)
 
     def SerialTemp(self, gui):
         self.threading_temp = True
-        cnt = 0
         while self.threading_temp:
             data = self.ser.readline()
             if len(data) > 0:
@@ -111,12 +111,15 @@ class SerialCtrl():
                 except Exception as e:
                     print(e)
     
-    def Airflow(self, gui):        
-        while time.perf_counter() < gui.refTime + 2:
+    def Airflow(self, gui):
+        t_flush = int(gui.clicked_flush.get())
+        t_sample = int(gui.clicked_sample.get())
+        t_purge = int(gui.clicked_purge.get())
+        while time.perf_counter() < gui.refTime + t_flush:
             self.ser.write(bytes('P', 'UTF-8'))
-        while time.perf_counter() < gui.refTime + 2 + 5:
+        while time.perf_counter() < gui.refTime + t_flush + t_sample:
             self.ser.write(bytes('S', 'UTF-8'))
-        while time.perf_counter() < gui.refTime + 2 + 5 + 7:
+        while time.perf_counter() < gui.refTime + t_flush + t_sample + t_purge:
             self.ser.write(bytes('P', 'UTF'))
         gui.stop_stream()
 

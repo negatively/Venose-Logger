@@ -243,6 +243,7 @@ class ConnGUI():
     
     def start_stream(self):
         self.serial.threading_temp = False
+        self.data.ClearData()
         # Menambahkan figure plot
         self.serial.ser.write(bytes('H', 'UTF-8'))
 
