@@ -156,15 +156,14 @@ class ConnGUI():
         self.graph.canvas.create_rectangle(75,75,25,25,outline = '#f11', fill='#fff', width=2)
         self.graph.canvas.create_text(65, 10, anchor=E, text='Temp')
         # Dynamic Part #
-        self.graph.text = self.graph.canvas.create_text(50, 50, anchor=E, text='---')
+        self.graph.text = self.graph.canvas.create_text(64, 60, anchor=E, text='---', font=('Arial 10 bold'))
         # Static Part #
-        self.graph.canvas.create_text(65, 50, anchor=E, text='C')
+        self.graph.canvas.create_text(55, 65, anchor=E, text='C', font=('Arial 10 bold'))
 
         self.serial.t4 = threading.Thread(
             target=self.serial.SerialTemp, args=(self,), daemon = True
         )
-        self.serial.t4.start()
-        
+        self.serial.t4.start()      
         
 
         ##########################################
@@ -177,7 +176,7 @@ class ConnGUI():
         self.ConnGUIOpen()
 
     def GraphCtrl(self):
-        self.graph.canvas.itemconfig(self.graph.text, text=f"{self.data.FloatMsg}")
+        self.graph.canvas.itemconfig(self.graph.text, text=f"{self.data.StrMsg}")
     
     def ConnGUIOpen(self):
         
@@ -219,7 +218,7 @@ class ConnGUI():
         self.drop_flush.config(width=10)
     
     def sample_option_menu(self):
-        t_sample = ["-", '30', '45', '60', '75', '90', '105', '120']
+        t_sample = ["-", '15','30', '45', '60', '75', '90', '105', '120']
         self.clicked_sample = StringVar()
         self.clicked_sample.set(t_sample[0])
         self.drop_sample = OptionMenu(
@@ -227,7 +226,7 @@ class ConnGUI():
         self.drop_sample.config(width=10)
 
     def purge_option_menu(self):
-        t_purge = ["-", '30', '45', '60', '75', '90', '105', '120']
+        t_purge = ["-", '15', '30', '45', '60', '75', '90', '105', '120']
         self.clicked_purge = StringVar()
         self.clicked_purge.set(t_purge[0])
         self.drop_purge = OptionMenu(
@@ -265,13 +264,8 @@ class ConnGUI():
         )
         self.serial.t1.start()
 
-        self.serial.t3 = threading.Thread(
-            target=self.serial.Airflow, args=(self,), daemon = True
-        )
-
-        self.serial.t3.start()
-
         self.UpdateChart()
+        self.UpdateTime()
 
     def stop_stream(self):
         self.serial.ser.write(bytes('O', 'UTF-8'))
@@ -293,13 +287,34 @@ class ConnGUI():
         self.chartMain.ax.clear()
         self.chartMain.ax.plot(self.data.x, self.data.y, '-', dash_capstyle='projecting')
         self.chartMain.ax.grid(color='b', linestyle='-', linewidth=0.2)
-        labels = ['TGS-822', 'TGS-2600', 'TGS-2611', 'MQ-3', 'MQ-9', 'MQ-135']
+        labels = ['TGS-2600', 'TGS-2611', 'MQ-3', 'TGS-822', 'MQ-9', 'MQ-135']
         self.chartMain.ax.legend(labels, prop={'size':6})
         self.chartMain.ax.set_ylabel('Data Sensor (mV)')
         self.chartMain.ax.set_xlabel('Time (s)')
         self.chartMain.fig.canvas.draw()
         if self.serial.threading:
             self.root.after(250, self.UpdateChart)
+
+    def UpdateTime(self):
+        t_flush = int(self.clicked_flush.get())
+        t_sample = int(self.clicked_sample.get())
+        t_purge = int(self.clicked_purge.get())
+        if time.perf_counter() < (self.refTime + t_flush):
+            self.serial.ser.write(bytes('P', 'UTF-8'))
+
+        elif time.perf_counter() < (self.refTime + t_flush + t_sample):
+            self.serial.ser.write(bytes('S', 'UTF-8'))
+
+        elif time.perf_counter() < (self.refTime + t_flush + t_sample + t_purge):
+            self.serial.ser.write(bytes('P', 'UTF-8'))
+
+        elif time.perf_counter() > (self.refTime + t_flush + t_sample + t_purge):
+            self.stop_stream() 
+    
+        if self.serial.threading:
+            self.root.after(250, self.UpdateTime)  
+        
+
 
 class PlotData():
     def __init__(self, root, serial, data):

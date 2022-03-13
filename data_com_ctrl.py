@@ -26,8 +26,8 @@ class DataMain():
     def IntMsgFunc(self):
         self.IntMsg = [int(msg) for msg in self.msg]
     
-    def FloatMsgFunc(self):
-        self.FloatMsg = float(self.msgTemp)
+    def StrMsgFunc(self):
+        self.StrMsg = str(self.msgTemp)
 
     def ClearData(self):
         self.RowMsg = ""
@@ -38,7 +38,7 @@ class DataMain():
     def SaveData(self):
         now = datetime.now()
         filename = "venose_data_" + now.strftime("%Y-%m-%d-%H-%M")+".csv"
-        labels = ['Time','TGS-822', 'TGS-2600', 'TGS-2611', 'MQ-3', 'MQ-9', 'MQ-135']
+        labels = ['Time','TGS-2600', 'TGS-2611', 'MQ-3', 'TGS-822', 'MQ-9', 'MQ-135']
         with open(filename, 'a', newline='') as f:
             data_writer = csv.writer(f)
             data_writer.writerow(labels)

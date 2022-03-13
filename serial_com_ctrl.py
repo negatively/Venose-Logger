@@ -101,27 +101,16 @@ class SerialCtrl():
 
                     gui.data.RowMsg = data
                     gui.data.DecodeMsg()
-                    gui.data.FloatMsgFunc()
-                    ###############################################                                        
-                    
-                    t2 = threading.Thread(target=gui.GraphCtrl(), args=(gui.graph,), daemon=True)
-                    t2.start()
-
+                    gui.data.StrMsgFunc()
+                    ###############################################
+                    gui.GraphCtrl()
 
                 except Exception as e:
                     print(e)
-    
-    def Airflow(self, gui):
-        t_flush = int(gui.clicked_flush.get())
-        t_sample = int(gui.clicked_sample.get())
-        t_purge = int(gui.clicked_purge.get())
-        while time.perf_counter() < gui.refTime + t_flush:
-            self.ser.write(bytes('P', 'UTF-8'))
-        while time.perf_counter() < gui.refTime + t_flush + t_sample:
-            self.ser.write(bytes('S', 'UTF-8'))
-        while time.perf_counter() < gui.refTime + t_flush + t_sample + t_purge:
-            self.ser.write(bytes('P', 'UTF'))
-        gui.stop_stream()
+               
+
+        
+        
 
 
 if __name__ == '__main__':
