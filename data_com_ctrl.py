@@ -1,6 +1,8 @@
 from datetime import datetime
 import csv
 
+from scipy.signal import savgol_filter
+
 class DataMain():
     def __init__(self):
         self.msg = []
@@ -45,6 +47,7 @@ class DataMain():
             for i in range(len(self.yData)):
                 data = [round(self.xData[i],1)] + self.yData[i]
                 data_writer.writerow(data)
+
 
     # def SetRefTime(self):
     #     if len(self.xData) == 0:
